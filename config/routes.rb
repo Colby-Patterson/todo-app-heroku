@@ -7,6 +7,6 @@ Rails.application.routes.draw do
   namespace :api do
     get '/todos', to: "todos#index"
     post '/todos', to: "todos#create"
-    get '/todos/:id', to: "todos#update"
+    put '/todos/:id', to: "todos#update"
   end
 end

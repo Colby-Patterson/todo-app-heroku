@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios"
 import {
   Button,
   Container,
@@ -13,15 +14,25 @@ import {
 export default class TodoList extends React.Component {
   state = {
     name: "",
-    todos: [
-      { id: 1, name: "work", completed: true },
-      { id: 2, name: "sleep", completed: false },
-    ],
+    todos: [],
   };
 
-  handleSubmit = (e) => {
+  async componentDidMount(){
+    try {
+      let res = await axios.get('/api/todos')
+      this.setState({
+        todos:res.data
+      })
+    }catch(err) {
+      alert("Error occurred")
+      console.log(err)
+    }
+  }
+
+  handleSubmit = async (e) => {
+    let res = await axios.post('/api/todos', {name:this.state.name})
     let newTodos = [
-      { name: this.state.name, complete: false, id: Math.random() },
+      res.data,
       ...this.state.todos,
     ];
     this.setState({
@@ -30,9 +41,10 @@ export default class TodoList extends React.Component {
     });
   };
 
-  toggleTodo = (id) => {
+  toggleTodo = async (id) => {
+    let res = await axios.put(`/api/todos/${id}`)
     let newTodos = this.state.todos.map((t) => {
-      return t.id !== id ? t : { ...t, completed: !t.completed };
+      return t.id !== id ? t : res.data
     });
     console.log(newTodos);
     this.setState({ todos: newTodos });
@@ -58,7 +70,7 @@ export default class TodoList extends React.Component {
           <List>
             {this.state.todos.map((t) => (
               <List.Item
-                style={{ textDecoration: t.completed ? "line-through" : "" }}
+                style={{ textDecoration: t.complete ? "line-through" : "" }}
                 onClick={() => this.toggleTodo(t.id)}
                 key={t.id}
               >
